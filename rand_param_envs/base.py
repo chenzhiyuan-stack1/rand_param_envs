@@ -59,7 +59,7 @@ class RandomEnv(MetaEnv, MujocoEnv):
     RAND_PARAMS_EXTENDED = RAND_PARAMS + ['geom_size']
 
     def __init__(self, log_scale_limit, file_name, *args, rand_params=RAND_PARAMS, **kwargs):
-        MujocoEnv.__init__(self, file_name, 4)
+        MujocoEnv.__init__(self, file_name, 1)
         assert set(rand_params) <= set(self.RAND_PARAMS_EXTENDED), \
             "rand_params must be a subset of " + str(self.RAND_PARAMS_EXTENDED)
         self.log_scale_limit = log_scale_limit            
@@ -107,7 +107,7 @@ class RandomEnv(MetaEnv, MujocoEnv):
         return param_sets
 
     def set_task(self, task):
-        for param, param_val in task.items():
+        for param, param_val in task.items(): # param是字典的key，param_val是字典的值
             param_variable = getattr(self.model, param)
             assert param_variable.shape == param_val.shape, 'shapes of new parameter value and old one must match'
             setattr(self.model, param, param_val)

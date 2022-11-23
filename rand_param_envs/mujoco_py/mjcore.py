@@ -79,6 +79,9 @@ class MjModel(MjModelWrapper):
     def step(self):
         mjlib.mj_step(self.ptr, self.data.ptr)
 
+    def collision_detection(self):
+        mjlib.mj_collision(self.ptr, self.data.ptr)
+
     def __del__(self):
         if self._wrapped is not None:
             # At the very end of the process, mjlib can be unloaded before we are deleted.

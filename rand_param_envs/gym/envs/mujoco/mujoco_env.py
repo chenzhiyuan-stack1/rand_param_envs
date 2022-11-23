@@ -26,7 +26,11 @@ class MujocoEnv(gym.Env):
             raise IOError("File %s does not exist" % fullpath)
         self.frame_skip = frame_skip
         self.model = mujoco_py.MjModel(fullpath)
+        if (fullpath == '/home/chenzhiyuan105/unitree_mujoco/data/a1/xml/a1.xml') :
+            self.ref_model = mujoco_py.MjModel(fullpath)
         self.data = self.model.data
+        if (fullpath == '/home/chenzhiyuan105/unitree_mujoco/data/a1/xml/a1.xml') :
+            self.ref_data = self.ref_model.data
         self.viewer = None
 
         self.metadata = {
@@ -34,9 +38,11 @@ class MujocoEnv(gym.Env):
             'video.frames_per_second': int(np.round(1.0 / self.dt))
         }
 
-        self.init_qpos = self.model.data.qpos.ravel().copy()
+        self.init_qpos = self.model.data.qpos.ravel().copy() # 拉成一维数组
         self.init_qvel = self.model.data.qvel.ravel().copy()
-        observation, _reward, done, _info = self._step(np.zeros(self.model.nu))
+        self.first_try = True
+        observation, _reward, done, _info = self._step(np.zeros(self.model.nu)) # 调用的是子类的_step()
+        self.first_try = False
         assert not done
         self.obs_dim = observation.size
 
@@ -88,7 +94,7 @@ class MujocoEnv(gym.Env):
         self.model.data.qpos = qpos
         self.model.data.qvel = qvel
         self.model._compute_subtree()  # pylint: disable=W0212
-        self.model.forward()
+        self.model.forward() # 不计时间的mj_step()
 
     @property
     def dt(self):
@@ -117,7 +123,7 @@ class MujocoEnv(gym.Env):
         if self.viewer is None:
             self.viewer = mujoco_py.MjViewer()
             self.viewer.start()
-            self.viewer.set_model(self.model)
+            self.viewer.set_model(self.ref_model)
             self.viewer_setup()
         return self.viewer
 
